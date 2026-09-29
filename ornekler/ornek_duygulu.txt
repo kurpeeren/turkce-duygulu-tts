@@ -1,0 +1,7 @@
+[nötr] Bugün sana bir şey anlatmam lazım.
+[heyecanlı] Az önce haberi aldım, projeyi kazandık! 3 ay uğraştık ama sonunda oldu!
+[mutlu] Gerçekten çok sevindim, emeklerimizin karşılığını aldık.
+[üzgün] Ama... Ahmet ekipten ayrılıyor. Bunu duymak beni çok üzdü.
+[kızgın] Sen zaten hep böyle yapıyorsun!
+[bağırarak] Her şeyi son dakikada söylüyorsun!
+[sakin] Neyse... sorun değil. Yarın konuşuruz, tamam mı?

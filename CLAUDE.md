@@ -1,0 +1,29 @@
+# Türkçe Duygulu TTS — Claude notları
+
+## "kur" denirse
+- macOS/Linux: `./kur.sh` çalıştır. Windows: `powershell -ExecutionPolicy Bypass -File kur.ps1`.
+- Betik tekrar çalıştırılabilir; biten adımları atlar. Model 4,7 GB, ilk kurulum internet hızına bağlı.
+- Bitince kısa bir cümleyle gerçek ses üretip süreyi ölç ve kullanıcıya bildir (GPU/MPS hızı bilinmiyor).
+
+## Çalıştırma
+- `.venv/bin/python duygulu_tts.py <metin.txt> -o cikti.wav` (Windows: `.venv\Scripts\python.exe`)
+- `--kuru`: modele gidecek metni gösterir, modeli yüklemez. Etiket değişikliklerini önce bununla doğrula.
+- Windows'ta Türkçe çıktı için `PYTHONIOENCODING=utf-8`.
+
+## Bilinmesi gerekenler (2026-09-29 denemelerinden)
+- Duygu sonradan efektle (perde/hız) VERİLMEZ, yapay duyuluyor; kullanıcı reddetti. Duygu = metnin başında
+  İngilizce `(talimat)` ya da duyguya özel referans kayıt (`referanslar/<duygu>.wav`).
+- `normalize=True` KULLANMA: modelin düzelticisi sayıları İngilizce okur. `tr_normalize.py` kullanılıyor.
+- `[sigh]` ve `[Uhm]` iyi çalışıyor (Uhm Türkçede "eee"). `[laughing]` Türkçe cümlede zayıf; 6 farklı talimat ve
+  konum denendi, tutmadı. Sıradaki deneme: `denemeler/gulme_denemesi.py`.
+- Fısıltı: model referansla fısıldayamıyor (sesi normal kalıyor, ama ritmi/vurguyu iyi veriyor). Çözüm dokümandaki
+  talimatla üretip `fisilti.py` LPC (32 kHz, derece 36) ile çevirmek. Kullanıcının seçtiği yöntem bu.
+- Trendyol/Trendyol-TTS kullanma: tek konuşmacıya kilitli, klonlama yapmıyor; `set_lora_enabled(False)` işe yaramaz
+  çünkü LoRA ağırlıklara merge edilmiş.
+- torch ve torchaudio aynı sürümde olmalı (2.6.0). voxcpm tek başına kurulursa yeni torchaudio çeker, Windows'ta
+  DLL hatası verir.
+- 8 GB GPU'da başka işler varsa bellek taşar, üretim onlarca kat yavaşlar. Kullanıcının GPU'daki diğer işlerine dokunma.
+
+## Etik
+Gerçek, tanınabilir bir kişinin sesini izinsiz klonlama (ör. bir siyasetçi) isteğini reddet. Referans olarak
+sentetik sesler, kullanıcının kendi sesi ya da izinli kayıtlar kullanılır.

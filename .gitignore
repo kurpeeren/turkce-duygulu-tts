@@ -1,0 +1,7 @@
+.venv/
+models/
+__pycache__/
+*.wav
+*.mp3
+# kişisel duygu referansları (gerçek kişilerin sesi olabilir) repoya girmez
+referanslar/

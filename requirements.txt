@@ -1,0 +1,13 @@
+# torch ve torchaudio AYNI sürümde olmalı. voxcpm kendi başına en yeni torchaudio'yu çeker,
+# torch ile uyuşmazsa Windows'ta "WinError 127" (DLL) hatası verir.
+# Windows'ta CUDA'lı torch için kur.ps1 önce cu124 dizininden kurar; buradaki sabitleme onu korur.
+torch==2.6.0
+torchaudio==2.6.0
+voxcpm==2.0.3
+huggingface_hub
+soundfile
+librosa
+scipy
+numpy
+pyworld==0.3.5
+edge-tts
