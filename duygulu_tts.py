@@ -56,16 +56,22 @@ SOZSUZ_SESLER = {
     "laughing": "laughing", "gülme": "laughing", "gülerek": "laughing", "kahkaha": "laughing",
     "sigh": "sigh", "iç çekme": "sigh", "iç çek": "sigh", "of": "sigh",
     "uhm": "Uhm", "hmm": "Uhm", "ııı": "Uhm", "eee": "Uhm",
-    "shh": "Shh", "şşş": "Shh", "sus": "Shh",
     "question-ah": "Question-ah", "question-ei": "Question-ei",
     "question-en": "Question-en", "question-oh": "Question-oh",
     "surprise-wa": "Surprise-wa", "surprise-yo": "Surprise-yo", "şaşırma": "Surprise-wa", "vay": "Surprise-wa",
     "dissatisfaction-hnn": "Dissatisfaction-hnn", "hoşnutsuzluk": "Dissatisfaction-hnn",
 }
 
+# Modele gitmeyen, avatarın sesinden üretilip araya eklenen sesler (ses_bankasi.py).
+# Model [Shh] etiketinde çok kısa bir ses veriyordu.
+EKLENEN_SESLER = {"şşş": "sss", "şş": "sss", "sus": "sss", "shh": "sss"}
+
 ETIKET = re.compile(r"\[([^\]]+)\]")
 # sözsüz ses etiketleri ayrıştırma sırasında duygu etiketi sanılmasın diye geçici olarak bu işaretlere alınır
 SOZSUZ_AC, SOZSUZ_KAPA = "⟦", "⟧"
+EKLE_AC, EKLE_KAPA = "⟪", "⟫"
+EKLENEN = re.compile(f"{EKLE_AC}(\\w+){EKLE_KAPA}")
+EKLENEN_SES_BOSLUGU = 0.15  # eklenen sesin önünde/arkasında sessizlik (sn)
 CFG = 2.0
 
 
@@ -76,9 +82,24 @@ def _turkce_kucuk(metin: str) -> str:
 
 def sozsuzleri_koru(metin: str) -> str:
     def degistir(m):
-        model_etiketi = SOZSUZ_SESLER.get(_turkce_kucuk(m.group(1)))
+        ad = _turkce_kucuk(m.group(1))
+        if ad in EKLENEN_SESLER:
+            return f" {EKLE_AC}{EKLENEN_SESLER[ad]}{EKLE_KAPA} "
+        model_etiketi = SOZSUZ_SESLER.get(ad)
         return f"{SOZSUZ_AC}{model_etiketi}{SOZSUZ_KAPA}" if model_etiketi else m.group()
     return ETIKET.sub(degistir, metin)
+
+
+def alt_parcalar(parca: str) -> list[tuple[str, str]]:
+    """Bir duygu parçasını ("metin", ...) ve ("ses", ad) sırasına böler; eklenen sesler modele gitmez."""
+    sonuc = []
+    for i, bolum in enumerate(EKLENEN.split(parca)):
+        # split, yakalanan grubu tek sıralı indekslerde döndürür
+        if i % 2:
+            sonuc.append(("ses", bolum))
+        elif bolum.strip():
+            sonuc.append(("metin", bolum.strip()))
+    return sonuc
 
 
 def ayar_bul(etiket: str) -> tuple[str, dict]:
@@ -130,27 +151,36 @@ def kirpma_koruma(y: np.ndarray) -> np.ndarray:
 def seslendir(parcalar, cikti: str, model_yolu: str):
     from voxcpm.core import VoxCPM  # --kuru modelsiz çalışsın diye burada
 
+    from ses_bankasi import klip
+
     model = VoxCPM.from_pretrained(hf_model_id=model_yolu, load_denoiser=False, optimize=False)
     sr = model.tts_model.sample_rate
+    bosluk = np.zeros(int(sr * EKLENEN_SES_BOSLUGU), dtype=np.float32)
     sesler = []
     for i, (ad, ayar, parca) in enumerate(parcalar, 1):
-        metin = model_metni(ayar, parca)
-        print(f"({i}/{len(parcalar)}) {metin}", file=sys.stderr)
-        y = model.generate(
-            text=metin,
-            reference_wav_path=referans_sec(ad),
-            cfg_value=CFG,
-            inference_timesteps=10,  # dokümandaki değer; beğenilen fısıltı da bununla üretildi
-            max_len=4096,
-            normalize=False,  # modelin normalizer'ı sayıları İngilizce okuyor
-            denoise=False,
-        )
-        if ayar.get("fisilti"):
-            from fisilti import fisiltiya_cevir_lpc
+        referans = referans_sec(ad)
+        for tur, icerik in alt_parcalar(parca):
+            if tur == "ses":
+                print(f"({i}/{len(parcalar)}) <{icerik}>", file=sys.stderr)
+                sesler += [bosluk, klip(icerik, model, referans), bosluk]
+                continue
+            metin = model_metni(ayar, icerik)
+            print(f"({i}/{len(parcalar)}) {metin}", file=sys.stderr)
+            y = model.generate(
+                text=metin,
+                reference_wav_path=referans,
+                cfg_value=CFG,
+                inference_timesteps=10,  # dokümandaki değer; beğenilen fısıltı da bununla üretildi
+                max_len=4096,
+                normalize=False,  # modelin normalizer'ı sayıları İngilizce okuyor
+                denoise=False,
+            )
+            if ayar.get("fisilti"):
+                from fisilti import fisiltiya_cevir_lpc
 
-            y = fisiltiya_cevir_lpc(y, sr, derece=36, ic_sr=32000)
-            y = y / (np.max(np.abs(y)) or 1.0) * FISILTI_TEPE
-        sesler.append(y)
+                y = fisiltiya_cevir_lpc(y, sr, derece=36, ic_sr=32000)
+                y = y / (np.max(np.abs(y)) or 1.0) * FISILTI_TEPE
+            sesler.append(y)
         sesler.append(np.zeros(int(sr * ayar["duraklama"]), dtype=np.float32))
     ses = kirpma_koruma(np.concatenate(sesler[:-1]))
     sf.write(cikti, ses.astype(np.float32), sr)
@@ -168,7 +198,8 @@ def main():
     parcalar = parcala(Path(args.girdi).read_text(encoding="utf-8"))
     if args.kuru:
         for ad, ayar, parca in parcalar:
-            print(f"[{ad}] {model_metni(ayar, parca)}")
+            bolumler = [f"<{icerik}>" if tur == "ses" else model_metni(ayar, icerik) for tur, icerik in alt_parcalar(parca)]
+            print(f"[{ad}] " + " + ".join(bolumler))
         return
     seslendir(parcalar, args.cikti, args.model)
 

@@ -64,7 +64,7 @@ Tek seferliktir; yazıldığı yere eklenir, duyguyu değiştirmez.
 |---|---|---|
 | `[iç çekme]`, `[of]` | `[sigh]` | iyi çalışıyor |
 | `[eee]`, `[hmm]`, `[ııı]` | `[Uhm]` | iyi çalışıyor, Türkçede "eee" olarak çıkıyor |
-| `[şşş]`, `[sus]` | `[Shh]` | |
+| `[şşş]`, `[sus]` | — | Modelin `[Shh]`'ı çok kısa kaldığı için kullanılmıyor. Avatarın sesinden üretilen 1,1 sn'lik "şşş" araya eklenir (`ses_bankasi.py`, ilk kullanımda üretilip `ses_bankasi/` altında saklanır) |
 | `[vay]`, `[şaşırma]` | `[Surprise-wa]` | |
 | `[hoşnutsuzluk]` | `[Dissatisfaction-hnn]` | |
 | `[gülme]`, `[kahkaha]` | `[laughing]` | Türkçe cümlede zayıf, bkz. Bilinen sınırlar |

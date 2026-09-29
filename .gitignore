@@ -6,3 +6,4 @@ __pycache__/
 # kişisel duygu referansları (gerçek kişilerin sesi olabilir) repoya girmez
 referanslar/
 *.log
+ses_bankasi/

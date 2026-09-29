@@ -16,6 +16,10 @@
 - `normalize=True` KULLANMA: modelin düzelticisi sayıları İngilizce okur. `tr_normalize.py` kullanılıyor.
 - `[sigh]` ve `[Uhm]` iyi çalışıyor (Uhm Türkçede "eee"). `[laughing]` Türkçe cümlede zayıf; 6 farklı talimat ve
   konum denendi, tutmadı. Sıradaki deneme: `denemeler/gulme_denemesi.py`.
+- "şşş": modelin [Shh]'ı çok kısa. ses_bankasi.py avatarın ş'lerinin LPC zarfından gürültüyle sentezliyor
+  (kullanıcı seçti). İnternetten alınan [ʃ] kaydı Emel'e göre çok kalındı (2,2 kHz vs 5,5 kHz). Genel ders:
+  ses tellerini kullanmayan sesler (nefes, şşş) avatarın sesinden sentezlenir; perdeli sesler (gülme, eee)
+  internetten alınırsa başka birinin sesi olur, modelden ya da ses dönüştürmeyle gelmeli.
 - Fısıltı: model referansla fısıldayamıyor (sesi normal kalıyor, ama ritmi/vurguyu iyi veriyor). Çözüm dokümandaki
   talimatla üretip `fisilti.py` LPC (32 kHz, derece 36) ile çevirmek. Kullanıcının seçtiği yöntem bu.
 - Trendyol/Trendyol-TTS kullanma: tek konuşmacıya kilitli, klonlama yapmıyor; `set_lora_enabled(False)` işe yaramaz
