@@ -96,8 +96,18 @@ Ses, modele gömülü değildir; 5-10 saniyelik bir referans kayıttan gelir.
 
 - **Gülme**: `[laughing]` Türkçe cümlelerde zayıf. `denemeler/gulme_denemesi.py` İngilizce cümle, yalnız gülme ve
   heceli gülme yöntemlerini dener (henüz sonuç yok).
-- **Hız**: VoxCPM2 ~8 GB GPU belleği ister. 8 GB kartta başka işler GPU'yu kullanıyorsa bellek taşar ve üretim
-  onlarca kat yavaşlar. Geliştiricinin verdiği değer RTX 4090'da gerçek zamanın ~0,3 katı.
+- **Hız** (üretim süresi / ses süresi):
+
+  | Donanım | Oran | 10 sn ses |
+  |---|---|---|
+  | RTX 4090 (geliştiricinin değeri) | ~0,3 | ~3 sn |
+  | Apple M6 Mac mini, 24 GB, MPS (ölçüldü) | ~2,0 | ~20 sn |
+  | RTX 4060 Laptop 8 GB, GPU başka işlerle paylaşılırken (ölçüldü) | ~40 | ~7 dk |
+
+  Model ~8 GB bellek ister; 8 GB kartta başka işler varsa bellek taşar ve üretim onlarca kat yavaşlar.
+  Model yüklemesi ayrıca ~13 sn sürer (Mac); uzun süre çalışan bir serviste bir kez yüklenir.
+- **macOS**: MPS'te bfloat16 desteklenmediği için model float32 çalışır. torch 2.6 MPS'te çöktüğü için macOS'ta 2.11
+  kurulur (`requirements.txt`).
 - **Sonradan efekt işe yaramaz**: Perde/hız değiştirerek duygu vermeyi denedik; yapay duyuluyor. Duygu modelin
   kendisinden gelmeli (talimat ya da duygulu referans kayıt).
 - **Trendyol/Trendyol-TTS**: Türkçe için ince ayarlanmış bir VoxCPM2 sürümü. Tek konuşmacıyla eğitilip ağırlıklara

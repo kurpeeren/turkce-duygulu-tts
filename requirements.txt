@@ -1,8 +1,12 @@
 # torch ve torchaudio AYNI sürümde olmalı. voxcpm kendi başına en yeni torchaudio'yu çeker,
 # torch ile uyuşmazsa Windows'ta "WinError 127" (DLL) hatası verir.
 # Windows'ta CUDA'lı torch için kur.ps1 önce cu124 dizininden kurar; buradaki sabitleme onu korur.
-torch==2.6.0
-torchaudio==2.6.0
+torch==2.6.0; sys_platform != "darwin"
+torchaudio==2.6.0; sys_platform != "darwin"
+# macOS (MPS): torch 2.6 modelin GQA dikkatinde çöküyor ("mps.matmul ... incompatible dimensions");
+# 2.11 çalışıyor (M6, 2026-09-29).
+torch==2.11.0; sys_platform == "darwin"
+torchaudio==2.11.0; sys_platform == "darwin"
 voxcpm==2.0.3
 huggingface_hub
 soundfile

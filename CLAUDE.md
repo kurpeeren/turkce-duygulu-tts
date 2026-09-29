@@ -20,8 +20,9 @@
   talimatla üretip `fisilti.py` LPC (32 kHz, derece 36) ile çevirmek. Kullanıcının seçtiği yöntem bu.
 - Trendyol/Trendyol-TTS kullanma: tek konuşmacıya kilitli, klonlama yapmıyor; `set_lora_enabled(False)` işe yaramaz
   çünkü LoRA ağırlıklara merge edilmiş.
-- torch ve torchaudio aynı sürümde olmalı (2.6.0). voxcpm tek başına kurulursa yeni torchaudio çeker, Windows'ta
-  DLL hatası verir.
+- torch ve torchaudio aynı sürümde olmalı. Windows/Linux 2.6.0 (voxcpm tek başına kurulursa yeni torchaudio çeker,
+  Windows'ta DLL hatası verir). macOS 2.11.0: torch 2.6 MPS'te "mps.matmul incompatible dimensions" ile çöküyor.
+- Ölçülen hız: Mac mini M6 (MPS, float32) üretim/ses oranı ~2,0, model yükleme ~13 sn.
 - 8 GB GPU'da başka işler varsa bellek taşar, üretim onlarca kat yavaşlar. Kullanıcının GPU'daki diğer işlerine dokunma.
 
 ## Etik
