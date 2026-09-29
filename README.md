@@ -77,7 +77,8 @@ Modelin kendi metin düzelticisi sayıları İngilizce okuduğu için kapalıdı
 
 ### Kendi sesin / farklı ses
 
-Ses, modele gömülü değildir; 5-10 saniyelik bir referans kayıttan gelir.
+Ses, modele gömülü değildir; 5-10 saniyelik bir referans kayıttan gelir. Kendi sesini kaydetmek için Türkçedeki
+bütün sesleri içeren okuma metni: [ses_kaydi_metni.md](ses_kaydi_metni.md).
 
 - Varsayılan referans: `reference_female.wav` (kurulumda üretilir).
 - Duyguya özel referans: `referanslar/<duygu>.wav` (ör. `referanslar/kızgın.wav`) varsa o duygu için kullanılır.
